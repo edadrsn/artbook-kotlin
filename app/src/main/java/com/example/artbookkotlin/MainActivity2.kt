@@ -44,9 +44,41 @@ class MainActivity2 : AppCompatActivity() {
     }
 
     fun saveButtonClicked(view: View) {
+        val artName=binding.artName.text.toString()
+        val artistName=binding.artistName.text.toString()
+        val year=binding.year.text.toString()
+
+        if(selectedBitmap!=null){
+            val smallBitmap=makeSmallerBitmap(selectedBitmap!!,300)
+        }
+
 
     }
 
+    //GÖRSELİ KÜÇÜLTMEK
+    private fun makeSmallerBitmap(image: Bitmap, maximumSize: Int): Bitmap {
+        var width = image.width
+        var height = image.height
+        val bitmapRatio: Double = width.toDouble() / height.toDouble()
+
+        if (bitmapRatio > 1) {
+            //Resim yatay-landscape
+            width = maximumSize
+            val scaleHeight = width / bitmapRatio
+            height = scaleHeight.toInt()
+
+        } else {
+            //Resim dikey-portrait
+            height = maximumSize
+            val scaleWidth = height * bitmapRatio
+            width = scaleWidth.toInt()
+
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true)
+    }
+
+
+    //RESİM SEÇME & KAMERA İZNİ
     fun selectImage(view: View) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             //Android 33+ -> READ_MEDIA_IMAGES
@@ -81,7 +113,7 @@ class MainActivity2 : AppCompatActivity() {
 
             }
         } else {
-            
+
             //Android 32 - -> READ_EXTERNAL_STORAGE
             //Daha önceden izin verilmiş mi kontrol et
             if (ContextCompat.checkSelfPermission(
@@ -119,6 +151,8 @@ class MainActivity2 : AppCompatActivity() {
     }
 
 
+    //REGISTERLAUNCHER: Intent Sonucu Almak için
+    //PERMISSIONLAUNCHER: İzin İstemek için
     private fun registerLauncher() {
         activityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -165,6 +199,8 @@ class MainActivity2 : AppCompatActivity() {
                         .show()
                 }
             }
-
     }
+
+
+
 }
