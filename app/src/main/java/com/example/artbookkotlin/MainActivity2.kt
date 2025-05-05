@@ -22,6 +22,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.artbookkotlin.databinding.ActivityMain2Binding
 import com.google.android.material.snackbar.Snackbar
+import java.io.ByteArrayOutputStream
 
 class MainActivity2 : AppCompatActivity() {
 
@@ -44,12 +45,40 @@ class MainActivity2 : AppCompatActivity() {
     }
 
     fun saveButtonClicked(view: View) {
-        val artName=binding.artName.text.toString()
-        val artistName=binding.artistName.text.toString()
-        val year=binding.year.text.toString()
+        val artName = binding.artName.text.toString()
+        val artistName = binding.artistName.text.toString()
+        val year = binding.year.text.toString()
 
-        if(selectedBitmap!=null){
-            val smallBitmap=makeSmallerBitmap(selectedBitmap!!,300)
+        if (selectedBitmap != null) {
+            val smallBitmap = makeSmallerBitmap(selectedBitmap!!, 300)
+
+            //Resmi 0 ve 1 lere çevirip veritabanına kaydetmek için yaptık
+            val outputStream = ByteArrayOutputStream()
+            smallBitmap.compress(Bitmap.CompressFormat.PNG, 50, outputStream)
+            val byteArray = outputStream.toByteArray()
+
+            try {
+                val database = this.openOrCreateDatabase("Arts", MODE_PRIVATE, null)
+                database.execSQL("CREATE TABLE IF NOT EXISTS arts(id INTEGER PRIMARY KEY,artname VARCHAR,artistname VARCHAR,year VARCHAR,image BLOB)")
+
+                val sqlString = "INSERT INTO arts(artname,artistname,year,image) VALUES(?,?,?,?)"
+                val statement = database.compileStatement(sqlString)
+                statement.bindString(1, artName)
+                statement.bindString(2, artistName)
+                statement.bindString(3, year)
+                statement.bindBlob(4, byteArray)
+                statement.execute()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+           val intent= Intent(this@MainActivity2,MainActivity::class.java)
+           intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)   //açık olan tüm activityleri kapat maine git
+           startActivity(intent)
+
+
+
+            //Veritabanından yukardaki byte dizisini çekip görsele dönüştürücez
         }
 
 
@@ -200,7 +229,6 @@ class MainActivity2 : AppCompatActivity() {
                 }
             }
     }
-
 
 
 }
