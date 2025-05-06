@@ -45,6 +45,8 @@ class MainActivity2 : AppCompatActivity() {
     }
 
     fun saveButtonClicked(view: View) {
+
+        //VERİ KAYDI
         val artName = binding.artName.text.toString()
         val artistName = binding.artistName.text.toString()
         val year = binding.year.text.toString()
