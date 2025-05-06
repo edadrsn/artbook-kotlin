@@ -1,9 +1,12 @@
 package com.example.artbookkotlin
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.sqlite.SQLiteDatabase
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.media.Image
 import android.os.Build
@@ -30,6 +33,7 @@ class MainActivity2 : AppCompatActivity() {
     private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
     var selectedBitmap: Bitmap? = null
+    private lateinit var database: SQLiteDatabase
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,9 +42,45 @@ class MainActivity2 : AppCompatActivity() {
         binding = ActivityMain2Binding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        database = this.openOrCreateDatabase("Arts", MODE_PRIVATE, null)
 
         registerLauncher()
 
+        val getIntent = intent
+        val info = intent.getStringExtra("info")
+        if (info.equals("new")) {
+            //Yeni eseri kaydet, Resetliyoruz normal görünsün
+            binding.artName.setText("")
+            binding.artistName.setText("")
+            binding.year.setText("")
+            binding.btnSave.visibility = View.VISIBLE
+            binding.image.setImageResource(R.drawable.select_image)
+
+        } else {
+            //Eserin içeriğini aç,eski eseri göster
+            binding.btnSave.visibility = View.INVISIBLE
+            val selectedId = intent.getIntExtra("id", 1)
+
+            val cursor =
+                database.rawQuery("SELECT * FROM arts WHERE id=?", arrayOf(selectedId.toString()))
+
+            val artNameIx = cursor.getColumnIndex("artname")
+            val artistNameIx = cursor.getColumnIndex("artistname")
+            val yearIx = cursor.getColumnIndex("year")
+            val imageIx = cursor.getColumnIndex("image")
+
+            while (cursor.moveToNext()) {
+                binding.artName.setText(cursor.getString(artNameIx))
+                binding.artistName.setText(cursor.getString(artistNameIx))
+                binding.year.setText(cursor.getString(yearIx))
+
+                val byteArray=cursor.getBlob(imageIx)
+                val bitmap=BitmapFactory.decodeByteArray(byteArray,0,byteArray.size)
+                binding.image.setImageBitmap(bitmap)
+            }
+
+            cursor.close()
+        }
 
     }
 
@@ -60,7 +100,6 @@ class MainActivity2 : AppCompatActivity() {
             val byteArray = outputStream.toByteArray()
 
             try {
-                val database = this.openOrCreateDatabase("Arts", MODE_PRIVATE, null)
                 database.execSQL("CREATE TABLE IF NOT EXISTS arts(id INTEGER PRIMARY KEY,artname VARCHAR,artistname VARCHAR,year VARCHAR,image BLOB)")
 
                 val sqlString = "INSERT INTO arts(artname,artistname,year,image) VALUES(?,?,?,?)"
@@ -74,10 +113,9 @@ class MainActivity2 : AppCompatActivity() {
                 e.printStackTrace()
             }
 
-           val intent= Intent(this@MainActivity2,MainActivity::class.java)
-           intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)   //açık olan tüm activityleri kapat maine git
-           startActivity(intent)
-
+            val intent = Intent(this@MainActivity2, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)   //açık olan tüm activityleri kapat maine git
+            startActivity(intent)
 
 
             //Veritabanından yukardaki byte dizisini çekip görsele dönüştürücez
