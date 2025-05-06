@@ -30,8 +30,8 @@ The app uses READ_EXTERNAL_STORAGE to access images from the device gallery (for
 
 Screenshots
 ![ArtBook Screenshot1](Screenshots/image1.png)
-![ArtBook Screenshot2](Screenshots/image2..png)
+![ArtBook Screenshot2](Screenshots/image2.png)
 ![ArtBook Screenshot3](Screenshots/image3.png)
 ![ArtBook Screenshot4](Screenshots/image4.png)
-![ArtBook Screenshot5](Screenshots/image5..png)
+![ArtBook Screenshot5](Screenshots/image5.png)
 
