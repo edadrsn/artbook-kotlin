@@ -26,7 +26,7 @@ art_menu.xml: Menu definition (Add Art button)
 button_border.xml, edittext_rounded.xml: Custom shapes for UI
 
 Permissions
-The app uses READ_EXTERNAL_STORAGE to access images from the device gallery (for Android 13 and below). For newer versions, it uses READ_MEDIA_IMAGES.
+The app uses READ_EXTERNAL_STORAGE to access images from the device gallery (for Android 33 and below). For newer versions, it uses READ_MEDIA_IMAGES.
 
 Screenshots
 ![ArtBook Screenshot1](Screenshots/image1.png)
